@@ -219,7 +219,7 @@ class LotoCard:
 
         return result
 
-if __name__ == '__main__'
+if __name__ == '__main__':
 
     str_name = input('Как Вас зовут?: ')
     try:
