@@ -57,43 +57,43 @@
 import random
 import sys
 
+
 class Game:
     # color schemes = (31 - 37)
     players = []
     cool_names = ['Алиса', 'Siri', 'OK Google', 'C3PO', 'R2D2', 'Bender', 'Вертер', '1000111001']
 
-    def __new__(cls, *args, **kwargs):
-        print(*args)
-        print(**kwargs)
-        return super().__new__(cls, *args, **kwargs)
-
-    def __init__(self, player_count, human_name):
+    def __new__(cls, player_count, human_name):
         if player_count < 2:
             print('Игроков должно быть не меньше 2.')
-            self.__delete__()
-        colors = list(range(31,38))
+            return None
+        else:
+            return super().__new__(cls)
+
+    def __init__(self, player_count, human_name):
+        colors = list(range(31, 38))
         random.shuffle(colors)
         random.shuffle(self.cool_names)
 
-        for cnt in range(0,player_count-1):
+        for cnt in range(0, player_count - 1):
             new_player = LotoCard(self.cool_names[cnt], 'ИскИн')
             new_player.player_color = colors[cnt]
             self.players.append(new_player)
 
         new_player = LotoCard(human_name, 'КусокМяса')
-        new_player.player_color = colors[player_count-1]
+        new_player.player_color = colors[player_count - 1]
         self.players.append(new_player)
 
     def the_showe_must_go_on(self):
 
         show_game = True
 
-        bochonki = list(range(1,91))
+        bochonki = list(range(1, 91))
         random.shuffle(bochonki)
         for player in self.players:
             player.generate_card()
 
-        human_player = self.players[len(self.players)-1]
+        human_player = self.players[len(self.players) - 1]
         winner = ''
 
         while len(bochonki) > 0 and winner == '':
@@ -111,7 +111,6 @@ class Game:
                 while not (str.upper() == 'N' or str.upper() == 'Y' or str.upper() == 'Q'):
                     str = input('Зачеркнуть цифру? (y/n)')
 
-
                 if str.upper() == 'Q':
                     sys.exit()
                 elif str.upper() == 'Y' and player_have_number:
@@ -123,7 +122,6 @@ class Game:
                     self.players.remove(human_player)
                     show_game = False
 
-
             for player in self.players:
                 if player.have_number(bochka):
                     player.hide_number(bochka)
@@ -131,6 +129,7 @@ class Game:
                     winner = f'{player.player_name} ({player.player_type})'
 
         print(f'Победил игрок: {winner}')
+
 
 class LotoCard:
     def __init__(self, player_name, player_type):
@@ -158,21 +157,21 @@ class LotoCard:
 
     def generate_card(self):
         # Перемешивание номеров и выборка первых 15
-        card_content = list(range(1,91))
+        card_content = list(range(1, 91))
         random.shuffle(card_content)
         card_content = card_content[0:15]
-        for cnt in range(0,3):
+        for cnt in range(0, 3):
             # Сотрировка каждой пятерки. Т.е. для каждой строки карточки.
-            string_content = sorted(card_content[5 * cnt : 5 * (cnt + 1)])
+            string_content = sorted(card_content[5 * cnt: 5 * (cnt + 1)])
             self.card__str__index = self.card__str__index + string_content
 
             # Распределение чисел в каждой строке по 5 случайным местам
-            string_places = list(range(1,10))
+            string_places = list(range(1, 10))
             random.shuffle(string_places)
             string_places = sorted(string_places[0:5])
 
             next_place = 1
-            for str_cnt in range(0,5):
+            for str_cnt in range(0, 5):
                 self.card[string_content[str_cnt]] = (cnt, string_places[str_cnt] - next_place, False)
                 # В каждом значении словаря храниться:
                 # 1) Номер строки в карточке
@@ -213,25 +212,21 @@ class LotoCard:
         result = result + ''.join(map(self.__convert_value_to_str, self.card__str__index[10:15])) + '\n'
 
         # Подвал карточки
-        result = result + '-'*27
+        result = result + '-' * 27
 
         # Завершение обертки в цвет игрока
         result = result + '\033[00m'
 
         return result
 
+if __name__ == '__main__'
 
-# for i in range(0,150):
-#     print(f'Color {i}:\033[{i}m @@@@@@@@@@@\033[00m')
+    str_name = input('Как Вас зовут?: ')
+    try:
+        int_count = int(input('Сколько игроков будет в игре?: '))
+    except ValueError:
+        print('Введено неверно значение. Игроком будет 2.')
+        int_count = 2
 
-# card_content = random.choices(range(1,91), k=15)
-# print(card_content)
-
-# Card_1 = LotoCard('Родварк', 'людь')
-# Card_1.generate_card()
-# print(Card_1)
-# Card_1.hide_number(Card_1.card__str__index[7])
-# print(Card_1)
-
-BigGame = Game(1, 'Функтик')
-BigGame.the_showe_must_go_on()
+    BigGame = Game(int_count, str_name)
+    BigGame.the_showe_must_go_on()
